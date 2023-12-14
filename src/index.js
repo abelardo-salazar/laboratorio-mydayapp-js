@@ -1,5 +1,14 @@
 import "./css/base.css";
 
-import { sayHello } from "./js/utils";
+import { onDOMLoad, newTodoInput, appendTodo } from "./js/utils";
 
-console.log(sayHello("Hello"));
+onDOMLoad();
+
+newTodoInput.addEventListener("keydown", (e) => {
+  if (e.keyCode == 13) {
+    appendTodo(newTodoInput.value);
+    newTodoInput.value = "";
+  }
+});
+
+// onEmptyListHideLayout()
