@@ -9,6 +9,15 @@ const footer = document.querySelector(".footer");
 const todoListContainer = document.querySelector(".todo-list");
 export const newTodoInput = document.querySelector(".new-todo");
 export const clearCompletedBtn = document.querySelector(".clear-completed");
+const filterAllBtn = document.querySelector(
+  "footer > ul > li:nth-child(1) > a"
+);
+const filterPendingBtn = document.querySelector(
+  "footer > ul > li:nth-child(2) > a"
+);
+const filterCompletedBtn = document.querySelector(
+  "footer > ul > li:nth-child(3) > a"
+);
 
 const getLocalTodos = () => {
   const localTodos = localStorage.getItem(todoListStorageKey);
@@ -149,6 +158,14 @@ const onListChange = () => {
     footer.hidden = false;
     setCounter();
   }
+  if (todoList && todoList.length) {
+    const completedCount = todoList.filter((todo) => todo.completed).length;
+    if (!completedCount) {
+      clearCompletedBtn.hidden = true;
+    } else {
+      clearCompletedBtn.hidden = false;
+    }
+  }
   localStorage.setItem(todoListStorageKey, JSON.stringify(todoList));
 };
 
@@ -172,23 +189,31 @@ export const appendTodo = (title) => {
 };
 
 const goHome = () => {
-  fillList()
+  fillList();
   location.hash = "#";
 };
 
 export const navigator = () => {
   if (location.hash.startsWith("#/pending")) {
+    filterAllBtn.classList.remove("selected");
+    filterPendingBtn.classList.add("selected");
+    filterCompletedBtn.classList.remove("selected");
     if (todoList) {
       filteredList = todoList.filter((todo) => !todo.completed);
       fillList(true);
     }
   } else if (location.hash.startsWith("#/completed")) {
     if (todoList) {
+      filterAllBtn.classList.remove("selected");
+      filterPendingBtn.classList.remove("selected");
+      filterCompletedBtn.classList.add("selected");
       filteredList = todoList.filter((todo) => todo.completed);
       fillList(true);
     }
   } else {
-    console.log("holi")
+    filterAllBtn.classList.add("selected");
+    filterPendingBtn.classList.remove("selected");
+    filterCompletedBtn.classList.remove("selected");
     fillList();
   }
 };
