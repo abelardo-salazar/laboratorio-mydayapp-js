@@ -1,10 +1,7 @@
-const todoList = [
-  { id: 1, title: "Read a book", completed: true },
-  { id: 2, title: "Do the laundry", completed: false },
-  { id: 3, title: "Buy groceries", completed: false },
-  { id: 4, title: "Prepare dinner", completed: true },
-  { id: 5, title: "Workout", completed: false },
-];
+let todoList = undefined;
+let filteredList = undefined;
+
+const todoListStorageKey = "mydayapp-js";
 
 // nodes
 const main = document.querySelector(".main");
@@ -13,12 +10,21 @@ const todoListContainer = document.querySelector(".todo-list");
 export const newTodoInput = document.querySelector(".new-todo");
 export const clearCompletedBtn = document.querySelector(".clear-completed");
 
+const getLocalTodos = () => {
+  const localTodos = localStorage.getItem(todoListStorageKey);
+  if (localTodos) {
+    todoList = JSON.parse(localTodos);
+  } else {
+    todoList = [];
+  }
+};
+
 const onToggleClick = (todoToUpdate) => {
   return () => {
     const idToUpdate = todoToUpdate.id;
     const indexToUpdate = todoList.findIndex((todo) => todo.id === idToUpdate);
     todoList[indexToUpdate].completed = !todoList[indexToUpdate].completed;
-    fillList();
+    goHome();
   };
 };
 
@@ -49,11 +55,11 @@ const editTodo = (idToUpdate, updatedTitle) => {
 
 const deleteTodo = (id) => {
   return () => {
-    const index = todoList.findIndex((todo) => todo.id === id)
-    todoList.splice(index,1)
-    fillList()
-  }
-}
+    const index = todoList.findIndex((todo) => todo.id === id);
+    todoList.splice(index, 1);
+    goHome();
+  };
+};
 
 const setCounter = () => {
   const counterContainer = document.querySelector(".todo-count");
@@ -66,12 +72,12 @@ const setCounter = () => {
 export const clearCompleted = () => {
   for (let i = 0; i < todoList.length; i++) {
     if (todoList[i].completed) {
-      console.log(todoList[i])
+      console.log(todoList[i]);
       todoList.splice(i, 1);
       i--;
     }
   }
-  fillList()
+  goHome();
 };
 
 const createTodoItem = ({ id, title = "", completed = false }) => {
@@ -111,7 +117,7 @@ const createTodoItem = ({ id, title = "", completed = false }) => {
 
   const todoDeleteBtn = document.createElement("button");
   todoDeleteBtn.setAttribute("class", "destroy");
-  todoDeleteBtn.addEventListener("click", deleteTodo(id))
+  todoDeleteBtn.addEventListener("click", deleteTodo(id));
   todoView.appendChild(todoDeleteBtn);
 
   todoWrapper.appendChild(todoView);
@@ -121,16 +127,21 @@ const createTodoItem = ({ id, title = "", completed = false }) => {
   todoListContainer.appendChild(todoWrapper);
 };
 
-export const fillList = () => {
+const fillList = (filtered = false) => {
+  const list = filtered ? filteredList : todoList;
   todoListContainer.innerHTML = "";
-  todoList.forEach((todo) => {
+  list.forEach((todo) => {
     createTodoItem(todo);
   });
-  onListLeghtChange();
+  onListChange();
 };
 
-export const onListLeghtChange = () => {
-  if (todoListContainer.children.length === 0) {
+const onListChange = () => {
+  if (
+    todoListContainer.children.length === 0 ||
+    !todoList ||
+    todoList.length === 0
+  ) {
     main.hidden = true;
     footer.hidden = true;
   } else {
@@ -138,18 +149,46 @@ export const onListLeghtChange = () => {
     footer.hidden = false;
     setCounter();
   }
+  localStorage.setItem(todoListStorageKey, JSON.stringify(todoList));
 };
 
 export const onDOMLoad = () => {
   document.addEventListener("DOMContentLoaded", () => {
+    getLocalTodos();
     newTodoInput.autofocus = true;
-    fillList();
+    navigator();
   });
 };
 
 export const appendTodo = (title) => {
   if (title.trim().length > 0) {
-    todoList.push({ title: title.trim(), id: Math.floor(Math.random() * 100) });
+    todoList.push({
+      title: title.trim(),
+      id: Math.floor(Math.random() * 100),
+      completed: false,
+    });
   }
-  fillList();
+  goHome();
+};
+
+const goHome = () => {
+  fillList()
+  location.hash = "#";
+};
+
+export const navigator = () => {
+  if (location.hash.startsWith("#/pending")) {
+    if (todoList) {
+      filteredList = todoList.filter((todo) => !todo.completed);
+      fillList(true);
+    }
+  } else if (location.hash.startsWith("#/completed")) {
+    if (todoList) {
+      filteredList = todoList.filter((todo) => todo.completed);
+      fillList(true);
+    }
+  } else {
+    console.log("holi")
+    fillList();
+  }
 };
