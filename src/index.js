@@ -1,6 +1,12 @@
 import "./css/base.css";
 
-import { onDOMLoad, newTodoInput, appendTodo } from "./js/utils";
+import {
+  onDOMLoad,
+  newTodoInput,
+  appendTodo,
+  clearCompletedBtn,
+  clearCompleted,
+} from "./js/utils";
 
 onDOMLoad();
 
@@ -10,5 +16,7 @@ newTodoInput.addEventListener("keydown", (e) => {
     newTodoInput.value = "";
   }
 });
+
+clearCompletedBtn.addEventListener("click", clearCompleted);
 
 // onEmptyListHideLayout()

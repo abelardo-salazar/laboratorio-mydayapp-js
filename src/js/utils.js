@@ -11,6 +11,7 @@ const main = document.querySelector(".main");
 const footer = document.querySelector(".footer");
 const todoListContainer = document.querySelector(".todo-list");
 export const newTodoInput = document.querySelector(".new-todo");
+export const clearCompletedBtn = document.querySelector(".clear-completed");
 
 const onToggleClick = (todoToUpdate) => {
   return () => {
@@ -52,6 +53,17 @@ const setCounter = () => {
   counterContainer.innerHTML = `<strong>${pendingTasksCount}</strong> ${
     pendingTasksCount === 1 ? "item" : "items"
   } left`;
+};
+
+export const clearCompleted = () => {
+  for (let i = 0; i < todoList.length; i++) {
+    if (todoList[i].completed) {
+      console.log(todoList[i])
+      todoList.splice(i, 1);
+      i--;
+    }
+  }
+  fillList()
 };
 
 const createTodoItem = ({ id, title = "", completed = false }) => {
