@@ -21,10 +21,29 @@ const onToggleClick = (todoToUpdate) => {
   };
 };
 
-const toggleEditMode = (todoWrapper) => {
+const toggleEditMode = (todoWrapper, todoEditInput) => {
   return () => {
     todoWrapper.classList.add("editing");
+    const prevTitle = todoEditInput.value;
+    todoEditInput.focus();
+    todoEditInput.select();
+    todoEditInput.addEventListener("keydown", (e) => {
+      if (e.keyCode == 13) {
+        const idToUpdate = parseInt(todoWrapper.getAttribute("id"));
+        editTodo(idToUpdate, todoEditInput.value.trim());
+        todoWrapper.classList.remove("editing");
+      } else if (e.keyCode == 27) {
+        todoEditInput.value = prevTitle;
+        todoWrapper.classList.remove("editing");
+      }
+    });
   };
+};
+
+const editTodo = (idToUpdate, updatedTitle) => {
+  const indexToUpdate = todoList.findIndex((todo) => todo.id === idToUpdate);
+  todoList[indexToUpdate].title = updatedTitle;
+  fillList();
 };
 
 const createTodoItem = ({ id, title = "", completed = false }) => {
@@ -51,7 +70,15 @@ const createTodoItem = ({ id, title = "", completed = false }) => {
   const todoLabel = document.createElement("label");
   todoLabel.innerHTML = title;
   todoLabel.style.cursor = "pointer";
-  todoLabel.addEventListener("dblclick", toggleEditMode(todoWrapper))
+
+  const todoEditInput = document.createElement("input");
+  todoEditInput.setAttribute("class", "edit");
+  todoEditInput.setAttribute("value", title);
+
+  todoLabel.addEventListener(
+    "click",
+    toggleEditMode(todoWrapper, todoEditInput)
+  );
   todoView.appendChild(todoLabel);
 
   const todoDeleteBtn = document.createElement("button");
@@ -60,9 +87,6 @@ const createTodoItem = ({ id, title = "", completed = false }) => {
 
   todoWrapper.appendChild(todoView);
 
-  const todoEditInput = document.createElement("input");
-  todoEditInput.setAttribute("class", "edit");
-  todoEditInput.setAttribute("value", title);
   todoWrapper.appendChild(todoEditInput);
 
   todoListContainer.appendChild(todoWrapper);
