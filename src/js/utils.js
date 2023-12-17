@@ -12,10 +12,28 @@ const footer = document.querySelector(".footer");
 const todoListContainer = document.querySelector(".todo-list");
 export const newTodoInput = document.querySelector(".new-todo");
 
+const onToggleClick = (todoToUpdate) => {
+  return () => {
+    const idToUpdate = todoToUpdate.id;
+    const indexToUpdate = todoList.findIndex((todo) => todo.id === idToUpdate);
+    todoList[indexToUpdate].completed = !todoList[indexToUpdate].completed;
+    fillList();
+  };
+};
+
+const toggleEditMode = (todoWrapper) => {
+  return () => {
+    todoWrapper.classList.add("editing");
+  };
+};
+
 const createTodoItem = ({ id, title = "", completed = false }) => {
   const todoWrapper = document.createElement("li");
   todoWrapper.setAttribute("id", id);
   todoWrapper.setAttribute("completed", completed);
+  if (completed) {
+    todoWrapper.classList.add("completed");
+  }
 
   const todoView = document.createElement("div");
   todoView.setAttribute("class", "view");
@@ -23,10 +41,17 @@ const createTodoItem = ({ id, title = "", completed = false }) => {
   const todoToggle = document.createElement("input");
   todoToggle.setAttribute("class", "toggle");
   todoToggle.setAttribute("type", "checkbox");
+  todoToggle.style.cursor = "pointer";
+  if (completed) {
+    todoToggle.setAttribute("checked", true);
+  }
+  todoToggle.addEventListener("click", onToggleClick({ id, title, completed }));
   todoView.appendChild(todoToggle);
 
   const todoLabel = document.createElement("label");
   todoLabel.innerHTML = title;
+  todoLabel.style.cursor = "pointer";
+  todoLabel.addEventListener("dblclick", toggleEditMode(todoWrapper))
   todoView.appendChild(todoLabel);
 
   const todoDeleteBtn = document.createElement("button");
@@ -48,7 +73,7 @@ export const fillList = () => {
   todoList.forEach((todo) => {
     createTodoItem(todo);
   });
-  onListLeghtChange()
+  onListLeghtChange();
 };
 
 export const onListLeghtChange = () => {
