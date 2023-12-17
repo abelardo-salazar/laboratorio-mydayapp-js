@@ -47,6 +47,14 @@ const editTodo = (idToUpdate, updatedTitle) => {
   fillList();
 };
 
+const deleteTodo = (id) => {
+  return () => {
+    const index = todoList.findIndex((todo) => todo.id === id)
+    todoList.splice(index,1)
+    fillList()
+  }
+}
+
 const setCounter = () => {
   const counterContainer = document.querySelector(".todo-count");
   const pendingTasksCount = todoList.filter((todo) => !todo.completed).length;
@@ -103,6 +111,7 @@ const createTodoItem = ({ id, title = "", completed = false }) => {
 
   const todoDeleteBtn = document.createElement("button");
   todoDeleteBtn.setAttribute("class", "destroy");
+  todoDeleteBtn.addEventListener("click", deleteTodo(id))
   todoView.appendChild(todoDeleteBtn);
 
   todoWrapper.appendChild(todoView);
