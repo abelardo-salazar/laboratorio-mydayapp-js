@@ -46,6 +46,14 @@ const editTodo = (idToUpdate, updatedTitle) => {
   fillList();
 };
 
+const setCounter = () => {
+  const counterContainer = document.querySelector(".todo-count");
+  const pendingTasksCount = todoList.filter((todo) => !todo.completed).length;
+  counterContainer.innerHTML = `<strong>${pendingTasksCount}</strong> ${
+    pendingTasksCount === 1 ? "item" : "items"
+  } left`;
+};
+
 const createTodoItem = ({ id, title = "", completed = false }) => {
   const todoWrapper = document.createElement("li");
   todoWrapper.setAttribute("id", id);
@@ -107,6 +115,7 @@ export const onListLeghtChange = () => {
   } else {
     main.hidden = false;
     footer.hidden = false;
+    setCounter();
   }
 };
 
